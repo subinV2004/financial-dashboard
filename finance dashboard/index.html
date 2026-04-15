@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pocket Pilot — AI Finance Dashboard</title>
+  <meta name="description" content="Pocket Pilot is your AI-powered personal finance co-pilot. Predict spending, track goals, and get real-time financial guidance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SPLASH SCREEN
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="splash-screen" class="splash">
+    <div class="splash-bg">
+      <div class="splash-orb orb-1"></div>
+      <div class="splash-orb orb-2"></div>
+      <div class="splash-orb orb-3"></div>
+      <div class="splash-grid"></div>
+    </div>
+
+    <div class="splash-content">
+      <div class="splash-icon">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="splashGrad" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00c87a"/>
+              <stop offset="0.5" stop-color="#00d4c8"/>
+              <stop offset="1" stop-color="#f5a623"/>
+            </linearGradient>
+          </defs>
+          <!-- Paper plane body -->
+          <path d="M8 40 L72 12 L52 68 L38 50 Z" stroke="url(#splashGrad)" stroke-width="2.5" stroke-linejoin="round" fill="rgba(0,200,122,0.08)"/>
+          <!-- Wing fold -->
+          <path d="M38 50 L36 64 L46 56" stroke="url(#splashGrad)" stroke-width="2" stroke-linejoin="round"/>
+          <!-- Fuselage line -->
+          <path d="M8 40 L52 68" stroke="url(#splashGrad)" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.5"/>
+          <!-- Speed lines -->
+          <path d="M4 30 L18 28" stroke="#00d4c8" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          <path d="M2 38 L12 37" stroke="#00c87a" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+          <path d="M5 46 L16 46" stroke="#f5a623" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        </svg>
+      </div>
+
+      <div class="splash-title">
+        <span class="splash-word word-pocket">
+          <span class="sl" style="--i:0">P</span><span class="sl" style="--i:1">O</span><span class="sl" style="--i:2">C</span><span class="sl" style="--i:3">K</span><span class="sl" style="--i:4">E</span><span class="sl" style="--i:5">T</span>
+        </span>
+        <span class="splash-space"> </span>
+        <span class="splash-word word-pilot">
+          <span class="sl" style="--i:7">P</span><span class="sl" style="--i:8">I</span><span class="sl" style="--i:9">L</span><span class="sl" style="--i:10">O</span><span class="sl" style="--i:11">T</span>
+        </span>
+      </div>
+
+      <p class="splash-tagline">Your AI-Powered Finance Co-Pilot</p>
+
+      <div class="splash-loader">
+        <div class="loader-bar"></div>
+      </div>
+    </div>
+
+    <button class="splash-skip" id="skip-btn" onclick="enterDashboard()">Skip →</button>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN APP
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="app" class="app hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 40 40" fill="none">
+            <defs>
+              <linearGradient id="sideGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#00c87a"/><stop offset="1" stop-color="#00d4c8"/>
+              </linearGradient>
+            </defs>
+            <!-- Paper plane -->
+            <path d="M4 20 L36 6 L26 34 L19 25 Z" stroke="url(#sideGrad)" stroke-width="1.8" stroke-linejoin="round" fill="rgba(0,200,122,0.1)"/>
+            <path d="M19 25 L18 32 L23 28" stroke="url(#sideGrad)" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M2 15 L9 14" stroke="#00d4c8" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+            <path d="M1 20 L7 20" stroke="#00c87a" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+          </svg>
+        </div>
+        <span class="brand-name">Pocket<strong>Pilot</strong></span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" id="nav-dashboard" onclick="switchSection('dashboard', this)">
+          <span class="nav-icon">⊞</span><span class="nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-transactions" onclick="switchSection('transactions', this)">
+          <span class="nav-icon">⇄</span><span class="nav-label">Transactions</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-goals" onclick="switchSection('goals', this)">
+          <span class="nav-icon">◎</span><span class="nav-label">Goals</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-calendar" onclick="switchSection('calendar', this)">
+          <span class="nav-icon">📅</span><span class="nav-label">Calendar</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-budget" onclick="switchSection('budget', this)">
+          <span class="nav-icon">▦</span><span class="nav-label">Budget</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-trackers" onclick="switchSection('trackers', this)">
+          <span class="nav-icon">📊</span><span class="nav-label">Trackers</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-tools" onclick="switchSection('tools', this)">
+          <span class="nav-icon">🛠</span><span class="nav-label">Tools</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-pilot" onclick="switchSection('pilot', this)">
+          <span class="nav-icon">✦</span><span class="nav-label">AI Pilot</span>
+          <span class="nav-badge">AI</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar" id="user-avatar">HP</div>
+        <div class="user-info">
+          <p class="user-name" id="user-name-display">Hello, Pilot!</p>
+          <p class="user-status">✦ AI Guided</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <button class="menu-btn" onclick="toggleSidebar()" id="menu-btn">☰</button>
+        <div class="topbar-left">
+          <h1 class="page-title" id="page-title">Dashboard</h1>
+          <p class="page-date" id="page-date"></p>
+        </div>
+        <div class="topbar-right">
+          <select class="currency-select" id="currency-select" onchange="changeCurrency()">
+            <option value="₹">₹ INR</option>
+            <option value="$">$ USD</option>
+            <option value="£">£ GBP</option>
+            <option value="€">€ EUR</option>
+            <option value="¥">¥ JPY</option>
+          </select>
+          <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" style="margin-left:8px">🌓</button>
+          <div class="ai-indicator" style="margin-left:8px">
+            <span class="ai-dot"></span>AI Active
+          </div>
+          <button class="btn-primary" onclick="openAddModal()">+ Add Entry</button>
+          <button class="notif-btn" title="Notifications">🔔</button>
+        </div>
+      </header>
+
+      <!-- ─── DASHBOARD SECTION ─── -->
+      <section id="section-dashboard" class="section active">
+
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+          <div class="kpi-card income-card" id="kpi-income">
+            <div class="kpi-icon">↑</div>
+            <div class="kpi-body">
+              <p class="kpi-label">Total Income</p>
+              <h2 class="kpi-value" id="total-income">₹0</h2>
+              <p class="kpi-change positive" id="income-change">+0% this month</p>
+            </div>
+            <canvas class="sparkline" id="spark-income" width="80" height="36"></canvas>
+          </div>
+          <div class="kpi-card expense-card" id="kpi-expense">
+            <div class="kpi-icon">↓</div>
+            <div class="kpi-body">
+              <p class="kpi-label">Total Expenses</p>
+              <h2 class="kpi-value" id="total-expense">₹0</h2>
+              <p class="kpi-change negative" id="expense-change">+0% this month</p>
+            </div>
+            <canvas class="sparkline" id="spark-expense" width="80" height="36"></canvas>
+          </div>
+          <div class="kpi-card savings-card" id="kpi-savings">
+            <div class="kpi-icon">◈</div>
+            <div class="kpi-body">
+              <p class="kpi-label">Net Savings</p>
+              <h2 class="kpi-value" id="total-savings">₹0</h2>
+              <p class="kpi-change" id="savings-rate">0% savings rate</p>
+            </div>
+            <canvas class="sparkline" id="spark-savings" width="80" height="36"></canvas>
+          </div>
+          <div class="kpi-card networth-card" id="kpi-networth">
+            <div class="kpi-icon">★</div>
+            <div class="kpi-body">
+              <p class="kpi-label">Net Worth</p>
+              <h2 class="kpi-value" id="total-networth">₹0</h2>
+              <p class="kpi-change positive" id="networth-change">Tracking your wealth</p>
+            </div>
+            <canvas class="sparkline" id="spark-networth" width="80" height="36"></canvas>
+          </div>
+        </div>
+
+        <!-- CHARTS ROW -->
+        <div class="charts-row">
+          <div class="glass-card chart-card-main">
+            <div class="card-header">
+              <h3 class="card-title">Income vs Expenses</h3>
+              <div class="chart-legend">
+                <span class="legend-dot income-dot"></span>Income
+                <span class="legend-dot expense-dot"></span>Expenses
+              </div>
+            </div>
+            <canvas id="main-chart" height="220"></canvas>
+          </div>
+
+          <div class="glass-card prediction-card">
+            <div class="card-header">
+              <h3 class="card-title">🤖 AI Prediction</h3>
+              <span class="ai-badge">ML Model</span>
+            </div>
+            <div class="prediction-body" id="prediction-body">
+              <div class="prediction-month">
+                <p class="pred-label">Predicted Next Month Spend</p>
+                <h2 class="pred-value" id="pred-amount">₹0</h2>
+                <p class="pred-note" id="pred-note">Calculating…</p>
+              </div>
+              <div class="prediction-cats" id="prediction-cats"></div>
+              <div class="ai-alert" id="ai-alert" style="display:none">
+                <span class="ai-alert-icon">⚡</span>
+                <p id="ai-alert-text"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM ROW -->
+        <div class="bottom-row">
+          <div class="glass-card budget-card-dash">
+            <div class="card-header">
+              <h3 class="card-title">Budget Status</h3>
+              <button class="link-btn" onclick="switchSection('budget', document.getElementById('nav-budget'))">View All →</button>
+            </div>
+            <div id="budget-dash-list" class="budget-dash-list"></div>
+          </div>
+
+          <div class="glass-card health-score-card">
+              <h3 class="card-title">Health Score</h3>
+              <div class="health-val" id="health-val">0</div>
+              <p class="health-label" id="health-label">Calculating your score...</p>
+              <canvas id="health-gauge" width="200" height="100" style="width:120px;margin-top:10px"></canvas>
+          </div>
+        </div>
+
+        <!-- NEW ROW: RECENT WINS & UPCOMING BILLS -->
+        <div class="bottom-row" style="margin-top:20px">
+           <div class="glass-card">
+              <h3 class="card-title">Latest Badges</h3>
+              <div class="badge-gallery" id="mini-badges"></div>
+           </div>
+           <div class="glass-card">
+              <h3 class="card-title">Upcoming Bills</h3>
+              <div id="mini-bills" class="budget-dash-list"></div>
+           </div>
+        </div>
+
+      </section>
+
+      <!-- ─── CALENDAR SECTION ─── -->
+      <section id="section-calendar" class="section">
+         <div class="glass-card full-card">
+           <div class="card-header">
+             <h3 class="card-title" id="cal-month-year">Calendar</h3>
+           </div>
+           <div class="calendar-grid" id="calendar-grid" style="margin-top:20px">
+             <!-- Calendar items will be injected here -->
+           </div>
+         </div>
+      </section>
+
+      <!-- ─── TRACKERS SECTION ─── -->
+      <section id="section-trackers" class="section">
+        <div class="bottom-row">
+           <div class="glass-card">
+              <div class="card-header">
+                 <h3 class="card-title">Bill Tracker</h3>
+                 <button class="btn-primary" onclick="openBillModal()">+ Add Bill</button>
+              </div>
+              <div id="full-bills-list" class="transactions-list"></div>
+           </div>
+           <div class="glass-card">
+              <div class="card-header">
+                 <h3 class="card-title">Debt Tracker</h3>
+                 <button class="btn-primary" onclick="openDebtModal()">+ Add Debt</button>
+              </div>
+              <div id="full-debts-list" class="transactions-list"></div>
+           </div>
+        </div>
+      </section>
+
+      <!-- ─── TOOLS SECTION ─── -->
+      <section id="section-tools" class="section">
+         <div class="bottom-row">
+           <div class="glass-card tool-card">
+             <h3 class="card-title">SIP Calculator</h3>
+             <div class="form-group" style="margin-top:15px">
+                <label class="form-label">Monthly Investment</label>
+                <input type="number" id="sip-monthly" class="form-input" placeholder="5000" oninput="calcSIP()">
+             </div>
+             <div class="form-row">
+                <div class="form-group">
+                   <label class="form-label">Expected Return (%)</label>
+                   <input type="number" id="sip-rate" class="form-input" placeholder="12" oninput="calcSIP()">
+                </div>
+                <div class="form-group">
+                   <label class="form-label">Time Period (Years)</label>
+                   <input type="number" id="sip-years" class="form-input" placeholder="10" oninput="calcSIP()">
+                </div>
+             </div>
+             <div class="tool-result">
+                <p class="form-label">Total Maturity Value</p>
+                <div class="tool-result-val" id="sip-result">₹0</div>
+             </div>
+           </div>
+           <div class="glass-card" style="padding:24px">
+              <h3 class="card-title">Report Center</h3>
+              <p style="font-size:0.85rem;color:var(--text-2);margin:12px 0">Download your financial profile as a detailed CSV report for external analysis.</p>
+              <button class="btn-primary full-btn" onclick="downloadCSV()">Download Monthly Report (CSV)</button>
+           </div>
+         </div>
+      </section>
+
+      <!-- ─── TRANSACTIONS SECTION ─── -->
+      <section id="section-transactions" class="section">
+        <div class="glass-card full-card">
+          <div class="card-header">
+            <h3 class="card-title">All Transactions</h3>
+            <div class="filter-row">
+              <select id="filter-type" class="filter-select" onchange="renderTransactions()">
+                <option value="all">All Types</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </select>
+              <select id="filter-cat" class="filter-select" onchange="renderTransactions()">
+                <option value="all">All Categories</option>
+              </select>
+              <button class="btn-primary" onclick="openAddModal()">+ Add Entry</button>
+            </div>
+          </div>
+          <div id="transactions-list" class="transactions-list"></div>
+        </div>
+      </section>
+
+      <!-- ─── GOALS SECTION ─── -->
+      <section id="section-goals" class="section">
+        <div class="section-header-row">
+          <h2 class="section-title">Financial Goals</h2>
+          <button class="btn-primary" onclick="openGoalModal()">+ New Goal</button>
+        </div>
+        <div id="goals-grid" class="goals-grid"></div>
+      </section>
+
+      <!-- ─── BUDGET SECTION ─── -->
+      <section id="section-budget" class="section">
+        <div class="section-header-row">
+          <h2 class="section-title">Budget Planner</h2>
+          <button class="btn-primary" onclick="openBudgetModal()">+ Set Budget</button>
+        </div>
+        <div id="budget-grid" class="budget-grid"></div>
+      </section>
+
+      <!-- ─── AI PILOT SECTION ─── -->
+      <section id="section-pilot" class="section">
+        <div class="pilot-layout">
+          <div class="glass-card pilot-chat-card">
+            <div class="pilot-header">
+              <div class="pilot-avatar-wrap">
+                <div class="pilot-avatar">✦</div>
+                <div class="pilot-status-dot"></div>
+              </div>
+              <div class="pilot-info">
+                <h3>AI Pilot</h3>
+                <p>Your personal finance co-pilot</p>
+              </div>
+              <button class="btn-ghost" onclick="clearChat()">Clear Chat</button>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-row">
+              <div class="quick-questions" id="quick-questions"></div>
+              <div class="chat-input-wrap">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Ask Pilot anything about your finances…" onkeydown="if(event.key==='Enter') sendChatMessage()" />
+                <button class="chat-send-btn" onclick="sendChatMessage()">➤</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pilot-sidebar">
+            <div class="glass-card insights-card">
+              <h3 class="card-title">📊 Instant Insights</h3>
+              <div id="ai-insights-list" class="insights-list"></div>
+            </div>
+            <div class="glass-card actions-card">
+              <h3 class="card-title">⚡ Recommended Actions</h3>
+              <div id="ai-actions-list" class="actions-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MODALS
+  ═══════════════════════════════════════════════════════════ -->
+
+  <!-- Add Transaction Modal -->
+  <div class="modal-overlay" id="add-modal" onclick="closeModal('add-modal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Financial Entry</h3>
+        <button class="modal-close" onclick="closeModal('add-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="type-toggle">
+          <button class="type-btn active" id="type-income" onclick="setType('income')">↑ Income</button>
+          <button class="type-btn" id="type-expense" onclick="setType('expense')">↓ Expense</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" id="entry-desc" class="form-input" placeholder="e.g. Salary, Groceries…" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Amount (₹)</label>
+            <input type="number" id="entry-amount" class="form-input" placeholder="0.00" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" id="entry-date" class="form-input" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="entry-cat" class="form-input">
+            <option value="Salary">💼 Salary</option>
+            <option value="Freelance">🖥 Freelance</option>
+            <option value="Investment">📈 Investment</option>
+            <option value="Other Income">💰 Other Income</option>
+            <option value="Food">🍔 Food & Dining</option>
+            <option value="Transport">🚗 Transport</option>
+            <option value="Shopping">🛍 Shopping</option>
+            <option value="Bills">💡 Bills & Utilities</option>
+            <option value="Health">🏥 Health</option>
+            <option value="Entertainment">🎬 Entertainment</option>
+            <option value="Education">📚 Education</option>
+            <option value="Rent">🏠 Rent</option>
+            <option value="Other">📋 Other</option>
+          </select>
+        </div>
+        </div>
+        <div class="form-group">
+           <label class="form-label" style="display:flex;align-items:center;gap:8px">
+             <input type="checkbox" id="entry-recurring" /> Recurring Monthly
+           </label>
+        </div>
+        <button class="btn-primary full-btn" onclick="addTransaction()">Add Entry</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Goal Modal -->
+  <div class="modal-overlay" id="goal-modal" onclick="closeModal('goal-modal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Create New Goal</h3>
+        <button class="modal-close" onclick="closeModal('goal-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Goal Name</label>
+          <input type="text" id="goal-name" class="form-input" placeholder="e.g. Emergency Fund, Vacation…" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Target Amount (₹)</label>
+            <input type="number" id="goal-target" class="form-input" placeholder="100000" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Saved So Far (₹)</label>
+            <input type="number" id="goal-saved" class="form-input" placeholder="0" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target Date</label>
+          <input type="date" id="goal-date" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon</label>
+          <div class="icon-picker" id="icon-picker">
+            <span class="icon-opt selected" onclick="selectIcon(this)" data-icon="🏖">🏖</span>
+            <span class="icon-opt" onclick="selectIcon(this)" data-icon="🚗">🚗</span>
+            <span class="icon-opt" onclick="selectIcon(this)" data-icon="🏠">🏠</span>
+            <span class="icon-opt" onclick="selectIcon(this)" data-icon="🎓">🎓</span>
+            <span class="icon-opt" onclick="selectIcon(this)" data-icon="💍">💍</span>
+            <span class="icon-opt" onclick="selectIcon(this)" data-icon="💰">💰</span>
+            <span class="icon-opt" onclick="selectIcon(this)" data-icon="📱">📱</span>
+            <span class="icon-opt" onclick="selectIcon(this)" data-icon="✈️">✈️</span>
+          </div>
+        </div>
+        <button class="btn-primary full-btn" onclick="addGoal()">Create Goal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Modal -->
+  <div class="modal-overlay" id="budget-modal" onclick="closeModal('budget-modal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Set Category Budget</h3>
+        <button class="modal-close" onclick="closeModal('budget-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="budget-cat" class="form-input">
+            <option value="Food">🍔 Food & Dining</option>
+            <option value="Transport">🚗 Transport</option>
+            <option value="Shopping">🛍 Shopping</option>
+            <option value="Bills">💡 Bills & Utilities</option>
+            <option value="Health">🏥 Health</option>
+            <option value="Entertainment">🎬 Entertainment</option>
+            <option value="Education">📚 Education</option>
+            <option value="Rent">🏠 Rent</option>
+            <option value="Other">📋 Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monthly Budget (₹)</label>
+          <input type="number" id="budget-amount" class="form-input" placeholder="5000" />
+        </div>
+        <button class="btn-primary full-btn" onclick="setBudget()">Set Budget</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Bill Modal -->
+  <div class="modal-overlay" id="bill-modal" onclick="closeModal('bill-modal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Track Upcoming Bill</h3>
+        <button class="modal-close" onclick="closeModal('bill-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Bill Name</label>
+          <input type="text" id="bill-name" class="form-input" placeholder="e.g. Electricity, Internet..." />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Amount</label>
+            <input type="number" id="bill-amount" class="form-input" placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input type="date" id="bill-date" class="form-input" />
+          </div>
+        </div>
+        <button class="btn-primary full-btn" onclick="addBill()">Add Bill Tracker</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Debt Modal -->
+  <div class="modal-overlay" id="debt-modal" onclick="closeModal('debt-modal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Track Debt / EMI</h3>
+        <button class="modal-close" onclick="closeModal('debt-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Debt Name</label>
+          <input type="text" id="debt-name" class="form-input" placeholder="e.g. Car Loan, Credit Card..." />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Principal Amount</label>
+            <input type="number" id="debt-total" class="form-input" placeholder="100000" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Remaining Balance</label>
+            <input type="number" id="debt-left" class="form-input" placeholder="85000" />
+          </div>
+        </div>
+        <button class="btn-primary full-btn" onclick="addDebt()">Add Debt Tracker</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding Modal -->
+  <div class="modal-overlay" id="onboarding-modal">
+    <div class="modal" style="width:500px">
+      <div class="modal-header">
+        <h3 class="modal-title">Welcome to Pocket Pilot! 🚀</h3>
+      </div>
+      <div class="modal-body" id="onboarding-steps">
+        <div id="step-1">
+          <p style="margin-bottom:15px;color:var(--text-2)">I'm your AI co-pilot. Let's get you set up in 30 seconds.</p>
+          <div class="form-group">
+             <label class="form-label">What should I call you?</label>
+             <input type="text" id="ob-name" class="form-input" placeholder="Your name" />
+          </div>
+          <button class="btn-primary full-btn" style="margin-top:20px" onclick="nextOBStep(2)">Next →</button>
+        </div>
+        <div id="step-2" style="display:none">
+          <p style="margin-bottom:15px;color:var(--text-2)">Knowing your income helps me suggest safe budgets.</p>
+          <div class="form-group">
+             <label class="form-label">Your Monthly Income</label>
+             <input type="number" id="ob-income" class="form-input" placeholder="e.g. 80000" />
+          </div>
+          <button class="btn-primary full-btn" style="margin-top:20px" onclick="finishOnboarding()">Complete Setup ✦</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="charts.js"></script>
+  <script src="ai-engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
